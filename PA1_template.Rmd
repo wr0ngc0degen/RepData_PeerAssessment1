@@ -74,7 +74,9 @@ avg.daily.activity$interval <- strptime(avg.daily.activity$interval, "%H%M", tz 
 Here formatting time appropriately for plotting using scales library.
 
 ```{r averageDailyActivityPlot}
-ggplot(avg.daily.activity, aes(interval, steps)) + geom_line() + scale_x_datetime(breaks = date_breaks("2 hours"),labels = date_format("%H:%M", tz="UTC")) + theme_bw() + labs(title = "Average Daily Activity Pattern", x = "Time", y = "Average number of steps")
+ggplot(avg.daily.activity, aes(interval, steps)) + geom_line() + 
+        scale_x_datetime(breaks = date_breaks("2 hours"),labels = date_format("%H:%M", tz="UTC")) + 
+        theme_bw() + labs(title = "Average Daily Activity Pattern", x = "Time", y = "Average number of steps")
 ```
 
 ###5 min interval with max average number of steps
@@ -165,7 +167,10 @@ avg.activity.by.wday$interval <- strptime(avg.activity.by.wday$interval, "%H%M",
 The only difference with the previous time series plot is that we use wday_factor as an argument to facet_grid()
 
 ```{r averageByWeekday}
-ggplot(avg.activity.by.wday, aes(interval, steps)) + geom_line() + scale_x_datetime(breaks = date_breaks("2 hours"),labels = date_format("%H:%M", tz="UTC")) + theme_bw() + labs(title = "Average Daily Activity Pattern by day of week", x = "Time", y = "Average number of steps" )+ facet_grid(wday_factor ~ .) 
+ggplot(avg.activity.by.wday, aes(interval, steps)) + geom_line() + 
+        scale_x_datetime(breaks = date_breaks("2 hours"),labels = date_format("%H:%M", tz="UTC")) + 
+        theme_bw() + labs(title = "Average Daily Activity Pattern by day of week", x = "Time", y = "Average number of steps") +
+        facet_grid(wday_factor ~ .) 
 ```
 
 So we can see that on weekends the subject is generally equally active during the day than on weekdays when we see burst of activity in the morning and then significantly less during the rest of the day. Also on the weekdays the activity starts earlies than on weekends which is not very surprising. 

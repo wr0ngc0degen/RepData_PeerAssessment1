@@ -83,7 +83,9 @@ Here formatting time appropriately for plotting using scales library.
 
 
 ```r
-ggplot(avg.daily.activity, aes(interval, steps)) + geom_line() + scale_x_datetime(breaks = date_breaks("2 hours"),labels = date_format("%H:%M", tz="UTC")) + theme_bw() + labs(title = "Average Daily Activity Pattern", x = "Time", y = "Average number of steps")
+ggplot(avg.daily.activity, aes(interval, steps)) + geom_line() + 
+        scale_x_datetime(breaks = date_breaks("2 hours"),labels = date_format("%H:%M", tz="UTC")) + 
+        theme_bw() + labs(title = "Average Daily Activity Pattern", x = "Time", y = "Average number of steps")
 ```
 
 ![plot of chunk averageDailyActivityPlot](figure/averageDailyActivityPlot-1.png) 
@@ -185,7 +187,10 @@ The only difference with the previous time series plot is that we use wday_facto
 
 
 ```r
-ggplot(avg.activity.by.wday, aes(interval, steps)) + geom_line() + scale_x_datetime(breaks = date_breaks("2 hours"),labels = date_format("%H:%M", tz="UTC")) + theme_bw() + labs(title = "Average Daily Activity Pattern by day of week", x = "Time", y = "Average number of steps" )+ facet_grid(wday_factor ~ .) 
+ggplot(avg.activity.by.wday, aes(interval, steps)) + geom_line() + 
+        scale_x_datetime(breaks = date_breaks("2 hours"),labels = date_format("%H:%M", tz="UTC")) + 
+        theme_bw() + labs(title = "Average Daily Activity Pattern by day of week", x = "Time", y = "Average number of steps") +
+        facet_grid(wday_factor ~ .) 
 ```
 
 ![plot of chunk averageByWeekday](figure/averageByWeekday-1.png) 
