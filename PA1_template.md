@@ -9,14 +9,16 @@ output:
 
 Reading zipped activity.csv
 
-```{r readingData}
+
+```r
 activity <- read.csv(unz("activity.zip", "activity.csv"), colClasses = 
                              c("integer", "Date", "integer"))
 ```
 
 Loading libraries that will be required for analysis and graphs building
 
-```{r loadLibs, message=FALSE}
+
+```r
 library(ggplot2)
 library(lubridate)
 library(scales)
@@ -28,25 +30,30 @@ library(dplyr)
 Counting total steps for each day.
 Note: aggregate function ignores NA by default.
 
-```{r total.steps}
+
+```r
 total.steps <- aggregate(steps ~ date, data = activity, FUN = sum)
 ```
 
 Build histogram of steps
-```{r histogram, message=FALSE}
+
+```r
 ggplot(total.steps, aes(x=steps)) + geom_histogram(aes(fill = ..count..)) + 
         theme_bw() + 
         labs(title = "Total number of steps taken each day", 
              x = "number of steps", y = "number of days")
 ```
 
-```{r statsTotalSteps}
+![plot of chunk histogram](figure/histogram-1.png) 
+
+
+```r
 mean.steps <- mean(total.steps$steps)
 median.steps <- median(total.steps$steps)
 ```
 
-Mean of the total number of steps taken per day is `r prettyNum(mean.steps)`  
-Median of the total number of steps taken per day is `r median.steps`
+Mean of the total number of steps taken per day is 10766.19  
+Median of the total number of steps taken per day is 10765
 
 ## What is the average daily activity pattern?
 
@@ -54,7 +61,8 @@ Median of the total number of steps taken per day is `r median.steps`
 Aggregating, then converting interval to time for the sake of plotting.
 Timezone is explicitly set to "UTC" to ensure that the same timezone is used in strptime() and date_format() functions.
 
-```{r averageDailyActivity}
+
+```r
 # aggregating by interval
 avg.daily.activity <- aggregate(steps ~ interval, data = activity, FUN = mean)
 # converting int to character to add missing zeroes for time conversion
@@ -73,34 +81,40 @@ avg.daily.activity$interval <- strptime(avg.daily.activity$interval, "%H%M", tz 
 
 Here formatting time appropriately for plotting using scales library.
 
-```{r averageDailyActivityPlot}
+
+```r
 ggplot(avg.daily.activity, aes(interval, steps)) + geom_line() + scale_x_datetime(breaks = date_breaks("2 hours"),labels = date_format("%H:%M", tz="UTC")) + theme_bw() + labs(title = "Average Daily Activity Pattern", x = "Time", y = "Average number of steps")
 ```
 
+![plot of chunk averageDailyActivityPlot](figure/averageDailyActivityPlot-1.png) 
+
 ###5 min interval with max average number of steps
 
-```{r}
+
+```r
 most.active.interval <- as.character.Date(avg.daily.activity$interval[which.max(avg.daily.activity$steps)], 
                                           format = "%H:%M")
 ```
 
-5-minutes interval starting at `r most.active.interval` contains the maximum number of steps on average across all the days in the dataset
+5-minutes interval starting at 08:35 contains the maximum number of steps on average across all the days in the dataset
 
 ## Imputing missing values
 
 ###Total number of missing values in the dataset
 
-```{r missingValues}
+
+```r
 nas.total <- sum(is.na(activity$steps))
 ```
 
-Total number of missing values is `r nas.total`
+Total number of missing values is 2304
 
 ### Fill in the missing values
 
 The strategy is to replace NA with the average amount of steps for that 5-minute interval across all the days.
 
-```{r fillMissingValues, message=FALSE}
+
+```r
 # count average activity for each interval
 avg.activity <- aggregate(steps ~ interval, data = activity, FUN = mean)
 # modify column names to join only by interval
@@ -115,7 +129,8 @@ act.no.nas[is.na(act.no.nas$steps),]$steps <- round(act.no.nas[is.na(act.no.nas$
 
 Build histogram of steps on modified data
 
-```{r histogramMod, message=FALSE}
+
+```r
 total.steps.no.na <- aggregate(steps ~ date, data = act.no.nas, FUN = sum)
 ggplot(total.steps.no.na, aes(x=steps)) + geom_histogram(aes(fill = ..count..)) + 
         theme_bw() + 
@@ -123,15 +138,18 @@ ggplot(total.steps.no.na, aes(x=steps)) + geom_histogram(aes(fill = ..count..)) 
              x = "number of steps", y = "number of days")
 ```
 
+![plot of chunk histogramMod](figure/histogramMod-1.png) 
+
 ### Mean and median of the modified dataset
 
-```{r statsTotalStepsNoNA}
+
+```r
 mean.steps <- mean(total.steps.no.na$steps)
 median.steps <- median(total.steps.no.na$steps)
 ```
 
-Mean of the total number of steps taken per day is `r prettyNum(mean.steps)`  
-Median of the total number of steps taken per day is `r prettyNum(median.steps)`
+Mean of the total number of steps taken per day is 10765.64  
+Median of the total number of steps taken per day is 10762
 
 The strategy to replace missing values was to replace them by all days average for this particular interval.
 That led to mean and median not changing.
@@ -141,7 +159,8 @@ Change for the histogram - bar corresponding to the mean of distibution increase
 
 Create a factor corresponding to the day of week with two levels - weekday and weekend.
 And then add it to the data to plot using the same conversions as previously for time series plot.
-```{r dayOfWeek}
+
+```r
 wday <- wday(activity$date)
 wday[wday == 1 | wday == 7] <- 1
 wday[wday > 1] <- 2
@@ -164,8 +183,11 @@ avg.activity.by.wday$interval <- strptime(avg.activity.by.wday$interval, "%H%M",
 ###Plotting
 The only difference with the previous time series plot is that we use wday_factor as an argument to facet_grid()
 
-```{r averageByWeekday}
+
+```r
 ggplot(avg.activity.by.wday, aes(interval, steps)) + geom_line() + scale_x_datetime(breaks = date_breaks("2 hours"),labels = date_format("%H:%M", tz="UTC")) + theme_bw() + labs(title = "Average Daily Activity Pattern by day of week", x = "Time", y = "Average number of steps" )+ facet_grid(wday_factor ~ .) 
 ```
+
+![plot of chunk averageByWeekday](figure/averageByWeekday-1.png) 
 
 So we can see that on weekends the subject is generally equally active during the day than on weekdays when we see burst of activity in the morning and then significantly less during the rest of the day. Also on the weekdays the activity starts earlies than on weekends which is not very surprising. 
